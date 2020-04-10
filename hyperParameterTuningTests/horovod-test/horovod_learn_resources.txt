@@ -1,0 +1,3 @@
+#resources
+https://github.com/horovod/horovod/blob/master/docs/concepts.rst
+https://github.com/horovod/horovod

@@ -1,0 +1,1 @@
+To use hyperparameter tuning or automated machine learning, create a persistent compute target instead. --> https://docs.microsoft.com/en-gb/azure/machine-learning/concept-compute-target#azure-machine-learning-compute-managed

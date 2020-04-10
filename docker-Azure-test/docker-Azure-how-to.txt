@@ -1,0 +1,5 @@
+https://docs.microsoft.com/en-us/azure/container-instances/container-instances-tutorial-prepare-app
+
+1. login using the command 'az login' and follow the interactive sign-in procedure
+2. then get the registry name from the main dashboard. It will look like this ->"cirrustest281215d679b.azurecr.io".
+Remove the .azr...co in the end and use the remaining in the following command
