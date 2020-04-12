@@ -28,11 +28,12 @@ print(device_lib.list_local_devices())
 parser = argparse.ArgumentParser()
 #parser.add_argument('--data-folder', type=str, dest='data_folder', help='data folder mounting point')
 parser.add_argument('--batch-size', type=int, dest='batch_size', default=50, help='mini batch size for training')
-parser.add_argument('--first-layer-neurons', type=int, dest='n_hidden_1', default=100,
-                    help='# of neurons in the first layer')
-parser.add_argument('--second-layer-neurons', type=int, dest='n_hidden_2', default=100,
-                    help='# of neurons in the second layer')
-parser.add_argument('--learning-rate', type=float, dest='learning_rate', default=0.001, help='learning rate')
+# parser.add_argument('--first-layer-neurons', type=int, dest='n_hidden_1', default=100,
+#                     help='# of neurons in the first layer')
+# parser.add_argument('--second-layer-neurons', type=int, dest='n_hidden_2', default=100,
+#                     help='# of neurons in the second layer')
+# parser.add_argument('--learning-rate', type=float, dest='learning_rate', default=0.001, help='learning rate')
+parser.add_argument('--epochs',type=int,dest='epochs',default=10,help='number of epochs')
 
 args = parser.parse_args()
 
@@ -56,40 +57,24 @@ X_train,y_train,X_test,y_test=create_data(no_samples=5000)
 
 training_set_size = X_train.shape[0]
 
-n_inputs = 28 * 28
-n_h1 = args.n_hidden_1
-n_h2 = args.n_hidden_2
-n_outputs = 10
-n_epochs = 20
+# n_inputs = 28 * 28
+# n_h1 = args.n_hidden_1
+# n_h2 = args.n_hidden_2
+# n_outputs = 10
+n_epochs = args.epochs
 batch_size = args.batch_size
-learning_rate = args.learning_rate
+#learning_rate = args.learning_rate
 
 #y_train = one_hot_encode(y_train, n_outputs)
 #y_test = one_hot_encode(y_test, n_outputs)
 print(X_train.shape, y_train.shape, X_test.shape, y_test.shape, sep='\n')
 
-#set up for gpu
-# strategy=tf.distribute.MirroredStrategy()
-# with strategy.scope():
-#     # Build a simple MLP model
-#     model = Sequential()
-#     # first hidden layer
-#     model.add(Dense(n_h1, activation='relu', input_shape=(n_inputs,)))
-#     # second hidden layer
-#     model.add(Dense(n_h2, activation='relu'))
-#     # output layer
-#     model.add(Dense(n_outputs, activation='softmax'))
-#     model.compile(loss='categorical_crossentropy',
-#                   optimizer=RMSprop(lr=learning_rate),
-#                   metrics=['accuracy'])
-
 model=build_model_gpu_unet()
+
 # start an Azure ML run
 run = Run.get_context()
 
 #get dataset generator for feeding in batches
-
-
 train_gen=DataGenerator(X=X_train,Y=y_train,batch_size=batch_size,shuffle=True)
 val_gen=DataGenerator(X=X_test,Y=y_test,batch_size=batch_size,shuffle=True)
 
@@ -102,12 +87,7 @@ class LogRunMetrics(Callback):
         run.log('Accuracy', log['accuracy'])
 
 
-# history = model.fit(X_train, y_train,
-#                     batch_size=batch_size,
-#                     epochs=n_epochs,
-#                     verbose=2,
-#                     validation_data=(X_test, y_test),
-#                     callbacks=[LogRunMetrics()])
+
 
 history = model.fit(train_gen,
                     #batch_size=batch_size,
