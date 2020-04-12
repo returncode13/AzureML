@@ -14,7 +14,7 @@ from tensorflow.keras.callbacks import Callback
 
 import tensorflow as tf
 
-#from azureml.core import Run
+from azureml.core import Run
 from utils import load_data, one_hot_encode, build_model_gpu_unet,create_data
 from datagenerator import *
 import math
@@ -85,7 +85,7 @@ print(X_train.shape, y_train.shape, X_test.shape, y_test.shape, sep='\n')
 
 model=build_model_gpu_unet()
 # start an Azure ML run
-#run = Run.get_context()
+run = Run.get_context()
 
 #get dataset generator for feeding in batches
 
@@ -94,12 +94,12 @@ train_gen=DataGenerator(X=X_train,Y=y_train,batch_size=batch_size,shuffle=True)
 val_gen=DataGenerator(X=X_test,Y=y_test,batch_size=batch_size,shuffle=True)
 
 
-# class LogRunMetrics(Callback):
-#     # callback at the end of every epoch
-#     def on_epoch_end(self, epoch, log):
-#         #         # log a value repeated which creates a list
-#         run.log('Loss', log['loss'])
-#         run.log('Accuracy', log['accuracy'])
+class LogRunMetrics(Callback):
+    # callback at the end of every epoch
+    def on_epoch_end(self, epoch, log):
+        # log a value repeated which creates a list
+        run.log('Loss', log['loss'])
+        run.log('Accuracy', log['accuracy'])
 
 
 # history = model.fit(X_train, y_train,
@@ -114,9 +114,8 @@ history = model.fit(train_gen,
                     steps_per_epoch=math.floor(len(X_train)/batch_size),
                     epochs=n_epochs,
                     verbose=2,
-                    validation_data=val_gen)
-# ,
-#                     callbacks=[LogRunMetrics()])
+                    validation_data=val_gen,
+                    callbacks=[LogRunMetrics()])
 
 
 
@@ -124,10 +123,10 @@ print(history)
 score = model.evaluate(X_test, y_test, verbose=0)
 
 # log a single value
-#run.log("Final test loss", score[0])
+run.log("Final test loss", score[0])
 print('Test loss:', score[0])
 
-#run.log('Final test accuracy', score[1])
+run.log('Final test accuracy', score[1])
 print('Test accuracy:', score[1])
 
 plt.figure(figsize=(6, 3))
