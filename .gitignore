@@ -1,5 +1,9 @@
-#ignore all  .npy files
+#ignore all  .npy,.jp2,.segy,.nc  files
 *.npy
 *.jp2
 *.segy
+*.nc
+
+#ignore all code generated results 
+
 Seismic_noise_segmentation/data/
